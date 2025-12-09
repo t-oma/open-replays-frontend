@@ -1,0 +1,24 @@
+{
+  "semi": true,
+  "trailingComma": "es5",
+  "singleQuote": false,
+  "printWidth": 80,
+  "tabWidth": 2,
+  "useTabs": false,
+  "plugins": [
+    "@ianvs/prettier-plugin-sort-imports",
+    "prettier-plugin-tailwindcss"
+  ],
+  "importOrder": [
+    "^react",
+    "",
+    "<BUILTIN_MODULES>",
+    "<THIRD_PARTY_MODULES>",
+    "^~/",
+    "^[./]",
+    "<TYPES>^(node:)",
+    "<TYPES>",
+    "<TYPES>^~/",
+    "<TYPES>^[./]"
+  ]
+}
