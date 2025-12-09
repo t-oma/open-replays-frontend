@@ -1,1 +1,1 @@
-export { default as ReplayPage } from "./views/Replay";
+export { default as ReplayPage } from "./views/ReplayPage";
