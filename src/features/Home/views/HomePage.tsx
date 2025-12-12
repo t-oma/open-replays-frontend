@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 
-import { API_URL, getVideos, idByPath, PageBody } from "~/shared";
+import { API_URL, getVideos, PageBody } from "~/shared";
 
 export default function HomePage() {
   const [videos, setVideos] = useState<string[]>([]);

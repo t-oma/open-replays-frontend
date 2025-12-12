@@ -7,15 +7,15 @@ import {
   FieldError,
   FieldGroup,
   FieldLabel,
-  formSchema,
   Input,
   uploadVideo,
+  uploadVideoSchema,
 } from "~/shared";
 import type { UploadFormSchema } from "~/shared";
 
 function UploadForm() {
   const form = useForm<UploadFormSchema>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(uploadVideoSchema),
     mode: "onChange",
     defaultValues: {
       title: "",
