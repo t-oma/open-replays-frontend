@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 
-import { Button } from "./ui/button";
+import { AuthButtons } from "./AuthButtons";
+import { Button } from "./ui";
 
 function Header() {
   return (
@@ -9,14 +10,13 @@ function Header() {
         OpenReplays
       </Link>
 
-      <div className="flex items-center gap-4">
-        <Button asChild variant="outline">
-          <Link to="/login">Login</Link>
-        </Button>
-        <Button asChild variant="default">
-          <Link to="/signup">Sign Up</Link>
-        </Button>
-      </div>
+      <Button asChild variant="outline">
+        <Link to="/upload" className="">
+          Upload
+        </Link>
+      </Button>
+
+      <AuthButtons />
     </header>
   );
 }

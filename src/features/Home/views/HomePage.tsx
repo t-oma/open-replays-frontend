@@ -1,22 +1,36 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
 
-import { idByPath, localVideoPaths, PageBody } from "~/shared";
+import { API_URL, getVideos, idByPath, PageBody } from "~/shared";
 
 export default function HomePage() {
-  const videoPaths = localVideoPaths();
+  const [videos, setVideos] = useState<string[]>([]);
+
+  useEffect(() => {
+    async function fetchVideos() {
+      const response = await getVideos();
+      setVideos(response.videos || []);
+    }
+
+    fetchVideos();
+  }, []);
 
   return (
     <PageBody>
       <h1 className="text-lg font-semibold">Latest Replays</h1>
 
       <div className="grid grid-cols-1 gap-4">
-        {videoPaths.map((path) => (
+        {videos.map((filename) => (
           <Link
-            key={path}
-            to={`/replays/${idByPath(path)}`}
+            key={filename}
+            to={`/replays/${filename}`}
             className="bg-muted inline-flex flex-col gap-2 rounded-md p-2"
           >
-            <video src={path} muted className="rounded">
+            <video
+              src={`${API_URL}/watch/${filename}`}
+              muted
+              className="rounded"
+            >
               <p>
                 To view this video please enable JavaScript, and consider
                 upgrading to a web browser that supports HTML5 video

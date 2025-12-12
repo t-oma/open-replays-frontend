@@ -11,5 +11,5 @@ export function meta(/*{}: Route.MetaArgs*/) {
 // export async function loader({ params }: Route.LoaderArgs) {}
 
 export default function ReplaysRoute({ params }: Route.ComponentProps) {
-  return <ReplayPage id={params.id} />;
+  return <ReplayPage filename={params.id} />;
 }

@@ -1,14 +1,13 @@
-import { PageBody } from "~/shared";
-import { LOCAL_VIDEOS_PATH } from "~/shared/constants";
+import { API_URL, PageBody } from "~/shared";
 
 type ReplayProps = {
-  id: string;
+  filename: string;
 };
 
-export default function ReplayPage({ id }: ReplayProps) {
+export default function ReplayPage({ filename }: ReplayProps) {
   return (
     <PageBody>
-      <video src={LOCAL_VIDEOS_PATH + id + ".mp4"} muted controls>
+      <video src={`${API_URL}/watch/${filename}`} muted controls>
         <p>
           To view this video please enable JavaScript, and consider upgrading to
           a web browser that supports HTML5 video

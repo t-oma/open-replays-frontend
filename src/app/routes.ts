@@ -5,5 +5,6 @@ export default [
   layout("./layout.tsx", [
     index("routes/home.tsx"),
     route("replays/:id", "routes/replays.tsx"),
+    route("upload", "routes/upload.tsx"),
   ]),
 ] satisfies RouteConfig;
