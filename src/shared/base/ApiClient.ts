@@ -46,6 +46,12 @@ class ApiClient {
       headers: {}, // Let browser set content-type for FormData
     });
   }
+
+  async delete<T>(endpoint: string): Promise<T> {
+    return this.request<T>(endpoint, {
+      method: "DELETE",
+    });
+  }
 }
 
 export const apiClient = new ApiClient(API_URL);

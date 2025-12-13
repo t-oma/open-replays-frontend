@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router";
 
 import { API_URL, getVideos, PageBody } from "~/shared";
+import type { Replay } from "~/shared";
 
 export default function HomePage() {
-  const [videos, setVideos] = useState<string[]>([]);
+  const [videos, setVideos] = useState<Replay[]>([]);
 
   useEffect(() => {
     async function fetchVideos() {
@@ -20,14 +21,14 @@ export default function HomePage() {
       <h1 className="text-lg font-semibold">Latest Replays</h1>
 
       <div className="grid grid-cols-1 gap-4">
-        {videos.map((filename) => (
+        {videos.map((replay) => (
           <Link
-            key={filename}
-            to={`/replays/${filename}`}
+            key={replay.title}
+            to={`/replays/${replay.filename}`}
             className="bg-muted inline-flex flex-col gap-2 rounded-md p-2"
           >
             <video
-              src={`${API_URL}/watch/${filename}`}
+              src={`${API_URL}/watch/${replay.filename}`}
               muted
               className="rounded"
             >
@@ -37,8 +38,10 @@ export default function HomePage() {
               </p>
             </video>
             <div className="flex items-center justify-between">
-              <h2 className="text-foreground">Video title</h2>
-              <span className="text-muted-foreground text-xs">2025-12-01</span>
+              <h2 className="text-foreground">{replay.title}</h2>
+              <span className="text-muted-foreground text-xs">
+                {replay.uploadedAt}
+              </span>
             </div>
           </Link>
         ))}

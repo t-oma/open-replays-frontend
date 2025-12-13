@@ -5,14 +5,11 @@ import type {
   UploadVideoResponse,
 } from "./types";
 
-async function getVideos(): Promise<GetVideosResponse> {
+async function getVideos() {
   return apiClient.get<GetVideosResponse>("/api/v1/videos");
 }
 
-async function uploadVideo({
-  title,
-  file,
-}: UploadFormSchema): Promise<UploadVideoResponse> {
+async function uploadVideo({ title, file }: UploadFormSchema) {
   const formData = new FormData();
   formData.append("title", title);
   formData.append("video", file);

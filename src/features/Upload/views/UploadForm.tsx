@@ -1,6 +1,7 @@
 import { Controller, useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 import {
   Button,
   Field,
@@ -22,8 +23,11 @@ function UploadForm() {
     },
   });
 
-  function onSubmit({ title, file }: UploadFormSchema) {
-    uploadVideo({ title, file }).then((result) => console.log(result));
+  async function onSubmit({ title, file }: UploadFormSchema) {
+    const response = await uploadVideo({ title, file });
+    console.log(response);
+
+    toast.success("Video uploaded successfully!");
   }
 
   return (
