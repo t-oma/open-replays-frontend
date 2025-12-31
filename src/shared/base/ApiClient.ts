@@ -1,4 +1,5 @@
 import { API_URL } from "~/shared";
+import type { ApiResponse } from "./types";
 
 class ApiClient {
   private baseURL: string;
@@ -10,36 +11,47 @@ class ApiClient {
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
-  ): Promise<T> {
+  ): Promise<T | undefined> {
     const url = `${this.baseURL}${endpoint}`;
 
-    const response = await fetch(url, {
-      headers: {
-        "Content-Type": "application/json",
-        ...options.headers,
-      },
-      ...options,
-    });
+    try {
+      const response = await fetch(url, {
+        headers: {
+          "Content-Type": "application/json",
+          ...options.headers,
+        },
+        ...options,
+      });
 
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.status} ${response.statusText}`);
+      const data = (await response.json()) as ApiResponse<T>;
+
+      if (!data.success) {
+        throw new Error(data.error || "Request failed");
+      }
+
+      if (!response.ok) {
+        throw new Error("Request failed");
+      }
+
+      return data.data;
+    } catch (error) {
+      console.error("API Error:", error);
+      throw error;
     }
-
-    return response.json();
   }
 
-  async get<T>(endpoint: string): Promise<T> {
-    return this.request<T>(endpoint);
+  async get<T>(endpoint: string) {
+    return this.request<T>(endpoint, { method: "GET" });
   }
 
-  async post<T>(endpoint: string, data?: unknown): Promise<T> {
+  async post<T>(endpoint: string, data?: unknown) {
     return this.request<T>(endpoint, {
       method: "POST",
       body: data ? JSON.stringify(data) : undefined,
     });
   }
 
-  async postForm<T>(endpoint: string, formData: FormData): Promise<T> {
+  async postForm<T>(endpoint: string, formData: FormData) {
     return this.request<T>(endpoint, {
       method: "POST",
       body: formData,
@@ -47,7 +59,7 @@ class ApiClient {
     });
   }
 
-  async delete<T>(endpoint: string): Promise<T> {
+  async delete<T>(endpoint: string) {
     return this.request<T>(endpoint, {
       method: "DELETE",
     });

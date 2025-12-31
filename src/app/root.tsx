@@ -12,6 +12,7 @@ import type { Route } from "./+types/root";
 import "./app.css";
 
 import { Toaster } from "~/shared";
+import { Providers } from "./providers";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -36,7 +37,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body className="flex min-h-screen flex-col">
-        {children}
+        <Providers>{children}</Providers>
         <Toaster richColors />
         <ScrollRestoration />
         <Scripts />

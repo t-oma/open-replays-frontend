@@ -1,21 +1,19 @@
 import * as z from "zod";
-import type { Prettify } from "~/shared/types";
 import type { uploadVideoSchema } from "./schema";
 
 export type Replay = {
   title: string;
   filename: string;
+  description: string;
   uploadedAt: string;
 };
 
-export type GetVideosSuccess = {
+export type GetVideosResponse = {
   videos: Replay[];
 };
 
-export type GetVideosResponse = Prettify<GetVideosSuccess>;
-
-export type UploadVideoResponse = Prettify<{
+export type UploadVideoResponse = {
   filename: string;
-}>;
+};
 
 export type UploadFormSchema = z.infer<typeof uploadVideoSchema>;
