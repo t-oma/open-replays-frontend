@@ -1,4 +1,5 @@
-import { UploadPage } from "~/features/Upload";
+import { UploadForm } from "~/features/Upload";
+import { PageBody } from "~/shared";
 
 export function meta(/*{}: Route.MetaArgs*/) {
   return [
@@ -7,6 +8,12 @@ export function meta(/*{}: Route.MetaArgs*/) {
   ];
 }
 
-export default function UploadRoute() {
-  return <UploadPage />;
+export default function Upload() {
+  return (
+    <PageBody className="items-center space-y-8 py-8">
+      <h1 className="text-xl font-semibold">Upload Replay</h1>
+
+      <UploadForm />
+    </PageBody>
+  );
 }

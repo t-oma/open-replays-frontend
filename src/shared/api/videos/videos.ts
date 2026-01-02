@@ -8,6 +8,11 @@ import type {
 export const videosAPI = {
   getAll: () => apiClient.get<GetVideosResponse>("/api/v1/videos"),
 
+  list: (filters: Record<string, string>) =>
+    apiClient.get<GetVideosResponse>(
+      `/api/v1/videos?${new URLSearchParams(filters)}`
+    ),
+
   upload: ({ title, file, thumbnail }: UploadFormSchema) => {
     const formData = new FormData();
     formData.append("video", file);

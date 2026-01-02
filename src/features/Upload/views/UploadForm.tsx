@@ -31,14 +31,14 @@ function UploadForm() {
   }
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+    <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-8">
       <FieldGroup>
         <Controller
           name="title"
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="replay-title">Replay Title</FieldLabel>
+              <FieldLabel htmlFor="replay-title">Title *</FieldLabel>
               <Input
                 {...field}
                 id="replay-title"
@@ -81,7 +81,7 @@ function UploadForm() {
             fieldState,
           }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="replay-file">Replay File</FieldLabel>
+              <FieldLabel htmlFor="replay-file">Video File *</FieldLabel>
               <Input
                 {...fieldProps}
                 id="replay-file"
