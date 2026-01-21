@@ -12,7 +12,9 @@ export function meta(/*{}: Route.MetaArgs*/) {
 }
 
 export async function clientLoader() {
-  queryClient.ensureQueryData(createListVideosQueryOptions({}));
+  console.log(
+    await queryClient.ensureQueryData(createListVideosQueryOptions({}))
+  );
 }
 
 export function HydrateFallback() {

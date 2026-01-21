@@ -6,6 +6,8 @@ import type {
 } from "./types";
 
 export const videosAPI = {
+  url: (path: string) => `${API_URL}${path}`,
+
   getAll: () => apiClient.get<GetVideosResponse>("/api/v1/videos"),
 
   list: (filters: Record<string, string>) =>
@@ -15,9 +17,12 @@ export const videosAPI = {
 
   upload: ({ title, file, thumbnail }: UploadFormSchema) => {
     const formData = new FormData();
+
     formData.append("video", file);
     formData.append("title", title);
-    formData.append("thumbnail", thumbnail);
+    if (thumbnail) {
+      formData.append("thumbnail", thumbnail);
+    }
 
     return apiClient.postForm<UploadVideoResponse>(
       "/api/v1/videos/upload",
@@ -28,5 +33,5 @@ export const videosAPI = {
   delete: (filename: string) => apiClient.delete(`/api/v1/videos/${filename}`),
 
   getWatchUrl: (filename: string) =>
-    `${API_URL}/api/v1/videos/${filename}/watch`,
+    videosAPI.url(`/api/v1/videos/${filename}/watch`),
 };

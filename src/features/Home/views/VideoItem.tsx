@@ -13,16 +13,11 @@ function VideoItem({ replay }: VideoItemProps) {
       to={`/replays/${replay.filename}`}
       className="bg-muted inline-flex flex-col gap-2 rounded-md p-2"
     >
-      <video
-        src={videosAPI.getWatchUrl(replay.filename)}
-        muted
+      <img
+        src={videosAPI.url(replay.thumbnail)}
+        alt={replay.title}
         className="rounded"
-      >
-        <p>
-          To view this video please enable JavaScript, and consider upgrading to
-          a web browser that supports HTML5 video
-        </p>
-      </video>
+      />
       <div className="flex items-center justify-between">
         <h2 className="text-foreground">{replay.title}</h2>
         <span className="text-muted-foreground text-xs">

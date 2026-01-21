@@ -4,7 +4,9 @@ import type { uploadVideoSchema } from "./schema";
 export type Replay = {
   title: string;
   filename: string;
+  fullFilename: string;
   description: string;
+  thumbnail: string;
   uploadedAt: string;
 };
 

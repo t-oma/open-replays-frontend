@@ -9,3 +9,10 @@ export const createListVideosQueryOptions = (
     queryFn: videosAPI.getAll,
   };
 };
+
+// export const createGetVideoQueryOptions = (filename: string) => {
+//   return {
+//     queryKey: videoKeys.get(filename),
+//     queryFn: videosAPI.get,
+//   };
+// };

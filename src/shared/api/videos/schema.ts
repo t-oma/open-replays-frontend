@@ -9,10 +9,17 @@ export const uploadVideoSchema = z.object({
     .nonoptional(),
   description: z
     .string()
-    .max(100, "Description must be at most 100 characters."),
-  thumbnail: z.instanceof(File).refine((file) => file.size <= MEGABYTE * 2, {
-    message: "File size must be less than 2MB",
-  }),
+    .max(100, "Description must be at most 100 characters.")
+    .optional(),
+  thumbnail: z
+    .instanceof(File)
+    .refine((file) => file.size <= MEGABYTE * 2, {
+      message: "File size must be less than 2MB",
+    })
+    .refine((file) => file.type.startsWith("image/"), {
+      message: "Only image files are allowed",
+    })
+    .optional(),
   file: z
     .instanceof(File)
     .refine((file) => file.size <= MEGABYTE * 10, {

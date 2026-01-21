@@ -1,1 +1,2 @@
-export { default as ReplayPage } from "./views/ReplayPage";
+export * from "./hooks";
+export * from "./views";
