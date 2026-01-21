@@ -9,3 +9,5 @@ export * from "./field";
 export * from "./sonner";
 export * from "./spinner";
 export * from "./textarea";
+export * from "./tooltip";
+export * from "./slider";
