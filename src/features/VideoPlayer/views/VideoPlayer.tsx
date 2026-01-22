@@ -8,18 +8,26 @@ import {
   PauseIcon,
   PictureInPictureIcon,
   PlayIcon,
+  SettingsIcon,
   Volume2Icon,
   VolumeXIcon,
 } from "lucide-react";
 import {
   Button,
   cn,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Slider,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "~/shared";
 import { useVideo } from "../hooks";
+import { SettingsDropdownMenu } from "./SettingsDropdownMenu";
 
 type VideoPlayerProps = {
   src: string;
@@ -52,6 +60,8 @@ export function VideoPlayer({
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const hideTimerRef = useRef<number | null>(null);
+  const [collisionBoundary, setCollisionBoundary] =
+    useState<HTMLElement | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
 
@@ -100,6 +110,13 @@ export function VideoPlayer({
     }
   }, [el]);
 
+  const onProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    const rect = e.currentTarget.getBoundingClientRect();
+    const percent = (e.clientX - rect.left) / rect.width;
+    actions.seek(percent * state.duration);
+  };
+
   // Synchronizes isFullscreen
   useEffect(() => {
     const onFsChange = () => setIsFullscreen(!!document.fullscreenElement);
@@ -118,7 +135,9 @@ export function VideoPlayer({
     const onKeyDown = (e: KeyboardEvent) => {
       if (
         e.target instanceof HTMLInputElement ||
-        e.target instanceof HTMLTextAreaElement
+        e.target instanceof HTMLTextAreaElement ||
+        e.target instanceof HTMLSelectElement ||
+        (e.target as Element).role === "slider"
       )
         return;
 
@@ -171,12 +190,10 @@ export function VideoPlayer({
     seekTime,
   ]);
 
-  const onProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-    const rect = e.currentTarget.getBoundingClientRect();
-    const percent = (e.clientX - rect.left) / rect.width;
-    actions.seek(percent * state.duration);
-  };
+  useEffect(() => {
+    // eslint-disable-next-line @eslint-react/hooks-extra/no-direct-set-state-in-use-effect
+    setCollisionBoundary(containerRef.current);
+  }, []);
 
   return (
     <div
@@ -321,6 +338,8 @@ export function VideoPlayer({
                 />
               </div>
             </div>
+
+            <SettingsDropdownMenu></SettingsDropdownMenu>
 
             {/* Fullscreen */}
             {showFullscreen && (

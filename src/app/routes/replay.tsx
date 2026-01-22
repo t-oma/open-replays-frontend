@@ -1,4 +1,4 @@
-import { VideoPlayer } from "~/features/Replay";
+import { VideoPlayer } from "~/features/VideoPlayer";
 import { PageBody, videosAPI } from "~/shared";
 import type { Route } from "./+types/replay";
 
