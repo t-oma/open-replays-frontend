@@ -42,9 +42,6 @@ function useVideo(options: UseVideoOptions = {}) {
   } = options;
 
   const [el, setEl] = useState<HTMLVideoElement | null>(null);
-
-  const rafId = useRef<number | null>(null);
-
   const [state, setState] = useState<VideoState>(() => ({
     ready: false,
     playing: false,
@@ -57,6 +54,13 @@ function useVideo(options: UseVideoOptions = {}) {
     volume: clamp(initialVolume, 0, 1),
     playbackRate: initialPlaybackRate,
   }));
+
+  const rafId = useRef<number | null>(null);
+  const seekThrottleRef = useRef<{
+    timer: number | null;
+    lastExec: number;
+    pending: number | null;
+  }>({ timer: null, lastExec: 0, pending: null });
 
   const ref: RefCallback<HTMLVideoElement> = useCallback((node) => {
     setEl(node);
@@ -75,6 +79,64 @@ function useVideo(options: UseVideoOptions = {}) {
       ended: video.ended,
     }));
   }, []);
+
+  const seekInternal = useCallback(
+    (timeSeconds: number) => {
+      if (!el) return;
+
+      const t = clamp(
+        timeSeconds,
+        0,
+        Number.isFinite(el.duration) ? el.duration : timeSeconds
+      );
+      el.currentTime = t;
+      syncFromEl(el);
+    },
+    [el, syncFromEl]
+  );
+
+  const seekThrottled = useCallback(
+    (timeSeconds: number, waitMs = 80) => {
+      if (!el) return;
+
+      // (trailing)
+      const t = clamp(
+        timeSeconds,
+        0,
+        Number.isFinite(el.duration) ? el.duration : timeSeconds
+      );
+      seekThrottleRef.current.pending = t;
+
+      const now = performance.now();
+      const elapsed = now - seekThrottleRef.current.lastExec;
+      const delay = Math.max(0, waitMs - elapsed);
+
+      if (seekThrottleRef.current.timer != null) return;
+
+      seekThrottleRef.current.timer = window.setTimeout(() => {
+        seekThrottleRef.current.timer = null;
+        seekThrottleRef.current.lastExec = performance.now();
+
+        const pending = seekThrottleRef.current.pending;
+        seekThrottleRef.current.pending = null;
+
+        if (pending != null) seekInternal(pending);
+      }, delay);
+    },
+    [el, seekInternal]
+  );
+
+  const flushSeek = useCallback(() => {
+    const pending = seekThrottleRef.current.pending;
+
+    if (seekThrottleRef.current.timer != null) {
+      clearTimeout(seekThrottleRef.current.timer);
+      seekThrottleRef.current.timer = null;
+    }
+
+    seekThrottleRef.current.pending = null;
+    if (pending != null) seekInternal(pending);
+  }, [seekInternal]);
 
   useEffect(() => {
     if (!el) return;
@@ -119,7 +181,7 @@ function useVideo(options: UseVideoOptions = {}) {
     const onError = () => setState((s) => ({ ...s, error: "Media error" }));
 
     const onSeeking = () => {
-      setState((s) => ({ ...s, waiting: true }));
+      setState((s) => ({ ...s, waiting: false })); // was waiting true
       syncFromEl(el);
     };
     const onSeeked = () => {
@@ -216,28 +278,21 @@ function useVideo(options: UseVideoOptions = {}) {
           el.pause();
         }
       },
-      seek: (timeSeconds: number) => {
-        if (!el) return;
-
-        const t = clamp(
-          timeSeconds,
-          0,
-          Number.isFinite(el.duration) ? el.duration : timeSeconds
-        );
-        el.currentTime = t;
-        syncFromEl(el);
-      },
+      seek: seekInternal,
+      seekThrottled,
+      flushSeek,
       setMuted: (muted: boolean) => {
         if (!el) return;
 
         el.muted = muted;
+        if (!muted && el.volume === 0) el.volume = 0.01;
         syncFromEl(el);
       },
       setVolume: (volume: number) => {
         if (!el) return;
 
         el.volume = clamp(volume, 0, 1);
-        if (el.volume > 0) el.muted = false;
+        el.muted = el.volume === 0;
         syncFromEl(el);
       },
       setPlaybackRate: (rate: number) => {
@@ -247,10 +302,13 @@ function useVideo(options: UseVideoOptions = {}) {
         syncFromEl(el);
       },
     };
-  }, [el, syncFromEl]);
+  }, [el, syncFromEl, seekInternal, seekThrottled, flushSeek]);
 
   return { ref, state, actions, el };
 }
 
+type UseVideoReturn = ReturnType<typeof useVideo>;
+type UseVideoActions = UseVideoReturn["actions"];
+
 export { useVideo };
-export type { VideoState, UseVideoOptions };
+export type { VideoState, UseVideoOptions, UseVideoReturn, UseVideoActions };

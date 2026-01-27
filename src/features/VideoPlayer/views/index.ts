@@ -1,2 +1,12 @@
-export * from "./VideoPlayer";
-export * from "./SettingsDropdownMenu";
+export { VideoPlayer } from "./VideoPlayer";
+export { ProgressBar } from "./ProgressBar";
+export { BufferingSpinner } from "./BufferingSpinner";
+export { CenterPlayButton } from "./CenterPlayButton";
+export { PiPButton } from "./PiPButton";
+export { FullscreenButton } from "./FullscreenButton";
+export { TimeDisplay } from "./TimeDisplay";
+export { PlayPauseButton } from "./PlayPauseButton";
+export { VolumeControl } from "./VolumeControl";
+export { VideoPlayerOverlay } from "./VideoPlayerOverlay";
+export { VideoPlayerContainer } from "./VideoPlayerContainer";
+export { VideoPlayerBottom } from "./VideoPlayerBottom";

@@ -7,6 +7,8 @@ function Slider({
   className,
   defaultValue,
   value,
+  "aria-label": ariaLabel,
+  "aria-valuetext": ariaValueText,
   min = 0,
   max = 100,
   ...props
@@ -52,6 +54,8 @@ function Slider({
           data-slot="slider-thumb"
           key={index}
           className="border-primary ring-ring/50 block size-4 shrink-0 cursor-pointer rounded-full border bg-white shadow-sm transition-[color,box-shadow] hover:ring-4 focus-visible:ring-4 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50"
+          aria-label={ariaLabel}
+          aria-valuetext={ariaValueText}
         />
       ))}
     </SliderPrimitive.Root>

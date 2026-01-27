@@ -7,12 +7,12 @@ function AuthButtons() {
   return (
     <>
       <div className="flex items-center gap-4 md:hidden">
-        <Button asChild variant="outline" size="icon">
+        <Button asChild variant="outline" size="icon" aria-label="Login">
           <Link to="/login">
             <LogInIcon className="" />
           </Link>
         </Button>
-        <Button asChild variant="default" size="icon">
+        <Button asChild variant="default" size="icon" aria-label="Sign Up">
           <Link to="/signup">
             <UserRoundPlusIcon className="" />
           </Link>
@@ -20,10 +20,10 @@ function AuthButtons() {
       </div>
 
       <div className="hidden items-center gap-4 md:flex">
-        <Button asChild variant="outline">
+        <Button asChild variant="outline" aria-label="Login">
           <Link to="/login">Login</Link>
         </Button>
-        <Button asChild variant="default">
+        <Button asChild variant="default" aria-label="Sign Up">
           <Link to="/signup">Sign Up</Link>
         </Button>
       </div>
