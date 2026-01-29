@@ -1,22 +1,5 @@
-const LOCAL_VIDEOS_PATH = "/replays/";
-const LOCAL_VIDEOS_PATH_FULL = "/public" + LOCAL_VIDEOS_PATH;
-
-const AVAILABLE_VIDEOS_EXTENSIONS = ["mp4"];
-const AVAILABLE_VIDEOS_EXTENSIONS_FULL = AVAILABLE_VIDEOS_EXTENSIONS.map(
-  (ext) => {
-    return `.${ext}`;
-  }
-);
-
 const MEGABYTE = 1024 * 1024;
 
 const API_URL = "http://localhost:8080";
 
-export {
-  LOCAL_VIDEOS_PATH,
-  LOCAL_VIDEOS_PATH_FULL,
-  AVAILABLE_VIDEOS_EXTENSIONS,
-  AVAILABLE_VIDEOS_EXTENSIONS_FULL,
-  MEGABYTE,
-  API_URL,
-};
+export { MEGABYTE, API_URL };
