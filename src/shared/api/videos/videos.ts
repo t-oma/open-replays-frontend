@@ -1,37 +1,38 @@
-import { API_URL, apiClient } from "~/shared";
+import { apiClient } from "~/shared";
 import type {
-  GetVideosResponse,
+  GetVideoResponse,
+  ListVideosResponse,
   UploadFormSchema,
   UploadVideoResponse,
 } from "./types";
 
-export const videosAPI = {
-  url: (path: string) => `${API_URL}${path}`,
+async function getVideoById(id: string) {
+  return apiClient.get<GetVideoResponse>(`/api/v1/videos/${id}`);
+}
 
-  getAll: () => apiClient.get<GetVideosResponse>("/api/v1/videos"),
+async function listVideos(filters: Record<string, string>) {
+  return apiClient.get<ListVideosResponse>(
+    `/api/v1/videos?${new URLSearchParams(filters)}`
+  );
+}
 
-  list: (filters: Record<string, string>) =>
-    apiClient.get<GetVideosResponse>(
-      `/api/v1/videos?${new URLSearchParams(filters)}`
-    ),
+async function uploadVideo({ title, file, thumbnail }: UploadFormSchema) {
+  const formData = new FormData();
 
-  upload: ({ title, file, thumbnail }: UploadFormSchema) => {
-    const formData = new FormData();
+  formData.append("video", file);
+  formData.append("title", title);
+  if (thumbnail) {
+    formData.append("thumbnail", thumbnail);
+  }
 
-    formData.append("video", file);
-    formData.append("title", title);
-    if (thumbnail) {
-      formData.append("thumbnail", thumbnail);
-    }
+  return apiClient.postForm<UploadVideoResponse>(
+    "/api/v1/videos/upload",
+    formData
+  );
+}
 
-    return apiClient.postForm<UploadVideoResponse>(
-      "/api/v1/videos/upload",
-      formData
-    );
-  },
+async function deleteVideo(id: string) {
+  return apiClient.delete(`/api/v1/videos/${id}`);
+}
 
-  delete: (filename: string) => apiClient.delete(`/api/v1/videos/${filename}`),
-
-  getWatchUrl: (filename: string) =>
-    videosAPI.url(`/api/v1/videos/${filename}/watch`),
-};
+export { getVideoById, listVideos, uploadVideo, deleteVideo };

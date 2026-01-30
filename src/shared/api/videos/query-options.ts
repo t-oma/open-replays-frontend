@@ -1,18 +1,18 @@
 import { videoKeys } from "./query-keys";
-import { videosAPI } from "./videos";
+import { getVideoById, listVideos } from "./videos";
 
 export const createListVideosQueryOptions = (
-  filters: Record<string, unknown>
+  filters: Record<string, string>
 ) => {
   return {
     queryKey: videoKeys.list(filters),
-    queryFn: videosAPI.getAll,
+    queryFn: () => listVideos(filters),
   };
 };
 
-// export const createGetVideoQueryOptions = (filename: string) => {
-//   return {
-//     queryKey: videoKeys.get(filename),
-//     queryFn: videosAPI.get,
-//   };
-// };
+export const createGetVideoQueryOptions = (id: string) => {
+  return {
+    queryKey: videoKeys.get(id),
+    queryFn: () => getVideoById(id),
+  };
+};

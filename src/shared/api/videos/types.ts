@@ -1,21 +1,35 @@
 import * as z from "zod";
 import type { uploadVideoSchema } from "./schema";
 
-export type Replay = {
+export type VideoSummary = {
+  id: string;
   title: string;
-  filename: string;
-  fullFilename: string;
-  description: string;
-  thumbnail: string;
+  thumbnailUrl: string;
+  duration?: number;
   uploadedAt: string;
 };
 
-export type GetVideosResponse = {
-  videos: Replay[];
+export type VideoDetails = {
+  id: string;
+  title: string;
+  description: string;
+  thumbnailurl: string;
+  videoUrl: string;
+  uploadedAt: string;
+  duration: number;
+  views: number;
+  // author: unknown;
+  // comments: unknown[];
 };
 
+export type ListVideosResponse = {
+  videos: VideoSummary[];
+};
+
+export type GetVideoResponse = VideoDetails;
+
 export type UploadVideoResponse = {
-  filename: string;
+  id: string;
 };
 
 export type UploadFormSchema = z.infer<typeof uploadVideoSchema>;

@@ -1,23 +1,18 @@
 import { Link } from "react-router";
 
-import { videosAPI } from "~/shared";
-import type { Replay } from "~/shared";
+import type { VideoSummary } from "~/shared";
 
 type VideoItemProps = {
-  replay: Replay;
+  replay: VideoSummary;
 };
 
 function VideoItem({ replay }: VideoItemProps) {
   return (
     <Link
-      to={`/replays/${replay.filename}`}
+      to={`/replays/${replay.id}`}
       className="bg-muted inline-flex flex-col gap-2 rounded-md p-2"
     >
-      <img
-        src={videosAPI.url(replay.thumbnail)}
-        alt={replay.title}
-        className="rounded"
-      />
+      <img src={replay.thumbnailUrl} alt={replay.title} className="rounded" />
       <div className="flex items-center justify-between">
         <h2 className="text-foreground">{replay.title}</h2>
         <span className="text-muted-foreground text-xs">

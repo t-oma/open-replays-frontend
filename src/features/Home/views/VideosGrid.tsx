@@ -1,8 +1,8 @@
 import { VideoItem } from "./VideoItem";
-import type { Replay } from "~/shared";
+import type { VideoSummary } from "~/shared";
 
 type VideosGridProps = {
-  videos?: Replay[];
+  videos?: VideoSummary[];
 };
 
 function VideosGrid({ videos }: VideosGridProps) {
