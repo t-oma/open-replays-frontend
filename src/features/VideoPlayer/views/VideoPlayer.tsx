@@ -211,7 +211,7 @@ function VideoPlayer({
             <ProgressBar />
 
             <div
-              className="flex items-center gap-2 py-2 text-white"
+              className="flex items-center gap-2 py-1 text-white"
               role="toolbar"
               aria-label="Video control buttons"
             >

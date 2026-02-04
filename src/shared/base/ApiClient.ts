@@ -23,14 +23,14 @@ class ApiClient {
         ...options,
       });
 
+      if (!response.ok) {
+        throw new Error(response.statusText || "Unknown Error");
+      }
+
       const data = (await response.json()) as ApiResponse<T>;
 
       if (!data.success) {
-        throw new Error(data.error || "Request failed");
-      }
-
-      if (!response.ok) {
-        throw new Error("Request failed");
+        throw new Error(data.error || "Unknown Error");
       }
 
       return data.data;

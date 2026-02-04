@@ -32,13 +32,21 @@ export default function Replay({ params }: Route.ComponentProps) {
     createGetVideoQueryOptions(params.id)
   );
 
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  }
+  if (error) return <div>Error: {error.message}</div>;
+
+  if (!data) throw new Error("Video data is absent for some reason");
 
   return (
     <PageBody>
+      <h1 className="text-xl font-semibold">{data!.title}</h1>
+
       <VideoPlayer src={data!.videoUrl} showFullscreen showPiP />
+
+      <div className="bg-secondary rounded-md p-2">
+        <span className="text-muted-foreground flex items-center gap-1 text-sm">
+          {data!.views} views
+        </span>
+      </div>
     </PageBody>
   );
 }

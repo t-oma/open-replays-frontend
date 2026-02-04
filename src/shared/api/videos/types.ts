@@ -5,7 +5,7 @@ export type VideoSummary = {
   id: string;
   title: string;
   thumbnailUrl: string;
-  duration?: number;
+  duration: number;
   uploadedAt: string;
 };
 
@@ -13,13 +13,13 @@ export type VideoDetails = {
   id: string;
   title: string;
   description: string;
-  thumbnailurl: string;
+  thumbnailUrl: string;
   videoUrl: string;
   uploadedAt: string;
   duration: number;
   views: number;
-  // author: unknown;
-  // comments: unknown[];
+  author?: unknown;
+  comments: unknown[];
 };
 
 export type ListVideosResponse = {

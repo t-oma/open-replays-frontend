@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 
 import * as SliderPrimitive from "@radix-ui/react-slider";
-import { formatTime, isDesktop } from "~/shared";
+import { formatTime } from "~/shared";
 import { cn } from "~/shared/utils/shadcn";
 import { useVideoPlayerContext } from "..";
 
