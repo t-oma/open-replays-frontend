@@ -4,4 +4,5 @@ export const videoKeys = {
   list: (filters: Record<string, unknown>) =>
     [...videoKeys.lists(), filters] as const,
   get: (id: string) => [...videoKeys.all, id] as const,
+  delete: (id: string) => [...videoKeys.all, "delete", id] as const,
 };

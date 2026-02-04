@@ -1,4 +1,5 @@
 import * as z from "zod";
+import type { Prettify } from "~/shared";
 import type { uploadVideoSchema } from "./schema";
 
 export type VideoSummary = {
@@ -22,13 +23,15 @@ export type VideoDetails = {
   comments: unknown[];
 };
 
-export type ListVideosResponse = {
-  videos: VideoSummary[];
-};
+export type ListVideosResponse = Prettify<VideoSummary>[];
 
 export type GetVideoResponse = VideoDetails;
 
 export type UploadVideoResponse = {
+  id: string;
+};
+
+export type DeleteVideoResponse = {
   id: string;
 };
 

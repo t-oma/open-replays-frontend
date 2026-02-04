@@ -1,5 +1,5 @@
 import { API_URL } from "~/shared";
-import type { ApiResponse } from "./types";
+import type { ErrorResponse, SuccessResponse } from "~/shared";
 
 class ApiClient {
   private baseURL: string;
@@ -11,7 +11,7 @@ class ApiClient {
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
-  ): Promise<T | undefined> {
+  ): Promise<SuccessResponse<T> | ErrorResponse> {
     const url = `${this.baseURL}${endpoint}`;
 
     try {
@@ -27,13 +27,9 @@ class ApiClient {
         throw new Error(response.statusText || "Unknown Error");
       }
 
-      const data = (await response.json()) as ApiResponse<T>;
+      const data = await response.json();
 
-      if (!data.success) {
-        throw new Error(data.error || "Unknown Error");
-      }
-
-      return data.data;
+      return data;
     } catch (error) {
       console.error("API Error:", error);
       throw error;

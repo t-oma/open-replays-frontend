@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { VideosGrid } from "~/features/Home";
-import { PageBody, Spinner } from "~/shared";
+import { isSuccessResponse, PageBody, Spinner } from "~/shared";
 import { createListVideosQueryOptions } from "~/shared/api/videos/query-options";
 import { queryClient } from "../providers";
 
@@ -30,7 +30,7 @@ export function HydrateFallback() {
 export default function Home() {
   const { data, error } = useSuspenseQuery(createListVideosQueryOptions({}));
 
-  if (error) {
+  if (error || !isSuccessResponse(data)) {
     return (
       <PageBody>
         <div className="flex-1 py-8 text-center">
@@ -40,11 +40,13 @@ export default function Home() {
     );
   }
 
+  const { data: videos } = data;
+
   return (
     <PageBody>
       <h1 className="text-lg font-semibold">Latest Replays</h1>
 
-      <VideosGrid videos={data?.videos} />
+      <VideosGrid videos={videos} />
     </PageBody>
   );
 }
