@@ -1,5 +1,5 @@
 import { API_URL } from "~/shared";
-import type { ErrorResponse, SuccessResponse } from "~/shared";
+import type { ApiResponse } from "~/shared";
 
 class ApiClient {
   private baseURL: string;
@@ -11,7 +11,7 @@ class ApiClient {
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
-  ): Promise<SuccessResponse<T> | ErrorResponse> {
+  ): Promise<ApiResponse<T>> {
     const url = `${this.baseURL}${endpoint}`;
 
     try {
@@ -52,6 +52,20 @@ class ApiClient {
       method: "POST",
       body: formData,
       headers: {}, // Let browser set content-type for FormData
+    });
+  }
+
+  async put<T>(endpoint: string, data?: unknown) {
+    return this.request<T>(endpoint, {
+      method: "PUT",
+      body: data ? JSON.stringify(data) : undefined,
+    });
+  }
+
+  async patch<T>(endpoint: string, data?: unknown) {
+    return this.request<T>(endpoint, {
+      method: "PATCH",
+      body: data ? JSON.stringify(data) : undefined,
     });
   }
 

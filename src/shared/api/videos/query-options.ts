@@ -1,6 +1,6 @@
 import { apiClient } from "~/shared";
 import { videoKeys } from "./query-keys";
-import type { GetVideoResponse, ListVideosResponse } from "~/shared";
+import type { GetVideoData, ListVideosData } from "~/shared";
 
 export const createListVideosQueryOptions = (
   filters: Record<string, string>
@@ -8,7 +8,7 @@ export const createListVideosQueryOptions = (
   return {
     queryKey: videoKeys.list(filters),
     queryFn: async () => {
-      return apiClient.get<ListVideosResponse>(
+      return apiClient.get<ListVideosData>(
         `/api/v1/videos?${new URLSearchParams(filters)}`
       );
     },
@@ -17,9 +17,9 @@ export const createListVideosQueryOptions = (
 
 export const createGetVideoQueryOptions = (id: string) => {
   return {
-    queryKey: videoKeys.get(id),
+    queryKey: videoKeys.detail(id),
     queryFn: async () => {
-      return apiClient.get<GetVideoResponse>(`/api/v1/videos/${id}`);
+      return apiClient.get<GetVideoData>(`/api/v1/videos/${id}`);
     },
   };
 };

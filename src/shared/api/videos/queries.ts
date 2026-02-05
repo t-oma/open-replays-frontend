@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { apiClient } from "~/shared";
 import { videoKeys } from "./query-keys";
-import type { UploadFormSchema, UploadVideoResponse } from "~/shared";
+import type { UploadFormSchema, UploadVideoData } from "~/shared";
 
 export function useUploadVideo() {
   const queryClient = useQueryClient();
@@ -20,7 +20,7 @@ export function useUploadVideo() {
         formData.append("thumbnail", thumbnail);
       }
 
-      return apiClient.postForm<UploadVideoResponse>(
+      return apiClient.postForm<UploadVideoData>(
         "/api/v1/videos/upload",
         formData
       );

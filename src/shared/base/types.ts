@@ -1,5 +1,7 @@
 export type ErrorResponse = {
   error: string;
+  statusCode?: number;
+  details?: unknown;
 };
 
 export type SuccessResponse<T> = {
@@ -10,7 +12,13 @@ export type SuccessResponse<T> = {
 export type ApiResponse<T> = SuccessResponse<T> | ErrorResponse;
 
 export function isSuccessResponse<T>(
-  response: SuccessResponse<T> | ErrorResponse
+  response: ApiResponse<T>
 ): response is SuccessResponse<T> {
   return "data" in response;
+}
+
+export function isErrorResponse(
+  response: ApiResponse<unknown>
+): response is ErrorResponse {
+  return "error" in response;
 }
