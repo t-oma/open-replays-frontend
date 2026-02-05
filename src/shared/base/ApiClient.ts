@@ -1,5 +1,6 @@
 import { API_URL } from "~/shared";
-import type { ApiResponse } from "~/shared";
+import { ApiError, isErrorResponse } from "./api-types";
+import type { ApiResponse, SuccessResponse } from "./api-types";
 
 class ApiClient {
   private baseURL: string;
@@ -11,7 +12,7 @@ class ApiClient {
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
-  ): Promise<ApiResponse<T>> {
+  ): Promise<SuccessResponse<T>> {
     const url = `${this.baseURL}${endpoint}`;
 
     try {
@@ -23,16 +24,79 @@ class ApiClient {
         ...options,
       });
 
-      if (!response.ok) {
-        throw new Error(response.statusText || "Unknown Error");
+      // Parse response body
+      let data: ApiResponse<T>;
+      try {
+        data = await response.json();
+      } catch {
+        // If JSON parsing fails, create a generic error
+        if (!response.ok) {
+          throw new ApiError(
+            {
+              code: "PARSE_ERROR",
+              message: response.statusText || "Failed to parse response",
+            },
+            response.status
+          );
+        }
+        throw new ApiError(
+          {
+            code: "PARSE_ERROR",
+            message: "Failed to parse response",
+          },
+          response.status
+        );
       }
 
-      const data = await response.json();
+      // Check if response is not OK (4xx or 5xx)
+      if (!response.ok) {
+        // Check if it's a structured error response from backend
+        if (isErrorResponse(data)) {
+          throw new ApiError(data, response.status);
+        }
 
+        // Fallback for unstructured errors
+        throw new ApiError(
+          {
+            code: "UNKNOWN_ERROR",
+            message: response.statusText || "An unknown error occurred",
+          },
+          response.status
+        );
+      }
+
+      // Check if successful response contains an error (unexpected but possible)
+      if (isErrorResponse(data)) {
+        throw new ApiError(data, response.status);
+      }
+
+      // Return the data from success response
       return data;
     } catch (error) {
-      console.error("API Error:", error);
-      throw error;
+      // Re-throw ApiError as-is
+      if (error instanceof ApiError) {
+        throw error;
+      }
+
+      // Wrap other errors
+      if (error instanceof Error) {
+        throw new ApiError(
+          {
+            code: "NETWORK_ERROR",
+            message: error.message || "Network error occurred",
+          },
+          0
+        );
+      }
+
+      // Unknown error
+      throw new ApiError(
+        {
+          code: "UNKNOWN_ERROR",
+          message: "An unexpected error occurred",
+        },
+        0
+      );
     }
   }
 
