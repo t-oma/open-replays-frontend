@@ -1,6 +1,9 @@
+import { useEffect } from "react";
+
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { VideosGrid } from "~/features/Home";
-import { isSuccessResponse, PageBody, Spinner } from "~/shared";
+import { getErrorMessage, isApiError, PageBody, Spinner } from "~/shared";
 import { createListVideosQueryOptions } from "~/shared/api/videos/query-options";
 import { queryClient } from "../providers";
 
@@ -28,13 +31,36 @@ export function HydrateFallback() {
 }
 
 export default function Home() {
-  const { data, error } = useSuspenseQuery(createListVideosQueryOptions({}));
+  const { data, error, isError } = useSuspenseQuery(
+    createListVideosQueryOptions({})
+  );
 
-  if (error || !isSuccessResponse(data)) {
+  // Handle errors with toast notifications
+  useEffect(() => {
+    if (isError && error) {
+      const message = getErrorMessage(error);
+      toast.error(message);
+
+      // Log detailed error in development
+      if (import.meta.env.DEV && isApiError(error)) {
+        console.error("Home page error:", {
+          code: error.code,
+          status: error.status,
+          message: error.message,
+          details: error.details,
+        });
+      }
+    }
+  }, [isError, error]);
+
+  if (isError) {
     return (
       <PageBody>
-        <div className="flex-1 py-8 text-center">
-          <p className="text-destructive">Failed to load videos</p>
+        <div className="flex flex-1 flex-col items-center justify-center gap-4 py-8">
+          <p className="text-destructive text-lg">Failed to load videos</p>
+          <p className="text-muted-foreground text-sm">
+            {getErrorMessage(error)}
+          </p>
         </div>
       </PageBody>
     );
