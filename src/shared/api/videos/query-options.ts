@@ -1,5 +1,4 @@
-import { apiClient } from "~/shared";
-import { videoKeys } from "./query-keys";
+import { apiClient, videoKeys } from "~/shared";
 import type { GetVideoData, ListVideosData } from "~/shared";
 
 export const createListVideosQueryOptions = (
