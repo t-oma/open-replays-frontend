@@ -1,6 +1,11 @@
-import { API_URL } from "~/shared";
-import { ApiError, isErrorResponse } from "./api-types";
-import type { ApiResponse, SuccessResponse } from "./api-types";
+import {
+  API_URL,
+  ApiError,
+  ClientError,
+  createApiError,
+  isErrorResponse,
+} from "~/shared";
+import type { ApiResponse, SuccessResponse } from "~/shared";
 
 class ApiClient {
   private baseURL: string;
@@ -29,22 +34,9 @@ class ApiClient {
       try {
         data = await response.json();
       } catch {
-        // If JSON parsing fails, create a generic error
-        if (!response.ok) {
-          throw new ApiError(
-            {
-              code: "PARSE_ERROR",
-              message: response.statusText || "Failed to parse response",
-            },
-            response.status
-          );
-        }
-        throw new ApiError(
-          {
-            code: "PARSE_ERROR",
-            message: "Failed to parse response",
-          },
-          response.status
+        throw new ClientError(
+          "PARSE_ERROR",
+          response.statusText || "Failed to parse response"
         );
       }
 
@@ -52,26 +44,23 @@ class ApiClient {
       if (!response.ok) {
         // Check if it's a structured error response from backend
         if (isErrorResponse(data)) {
-          throw new ApiError(data, response.status);
+          throw createApiError(data, response.status);
         }
 
         // Fallback for unstructured errors
-        throw new ApiError(
-          {
-            code: "UNKNOWN_ERROR",
-            message: response.statusText || "An unknown error occurred",
-          },
-          response.status
+        throw new ClientError(
+          "UNKNOWN_ERROR",
+          response.statusText || "An unknown error occurred"
         );
       }
 
       // Check if successful response contains an error (unexpected but possible)
       if (isErrorResponse(data)) {
-        throw new ApiError(data, response.status);
+        throw createApiError(data, response.status);
       }
 
-      // Return the data from success response
-      return data;
+      // Return the success response with data and message
+      return data as SuccessResponse<T>;
     } catch (error) {
       // Re-throw ApiError as-is
       if (error instanceof ApiError) {
@@ -80,23 +69,10 @@ class ApiClient {
 
       // Wrap other errors
       if (error instanceof Error) {
-        throw new ApiError(
-          {
-            code: "NETWORK_ERROR",
-            message: error.message || "Network error occurred",
-          },
-          0
-        );
+        throw new ClientError("NETWORK_ERROR", error.message);
       }
 
-      // Unknown error
-      throw new ApiError(
-        {
-          code: "UNKNOWN_ERROR",
-          message: "An unexpected error occurred",
-        },
-        0
-      );
+      throw new ClientError("UNKNOWN_ERROR", "An unexpected error occurred");
     }
   }
 
