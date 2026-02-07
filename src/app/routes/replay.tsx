@@ -4,9 +4,9 @@ import { useRevalidator, useRouteError } from "react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { VideoPlayer } from "~/features/VideoPlayer";
+import { createGetVideoQueryOptions } from "~/features/Videos";
 import {
   Button,
-  createGetVideoQueryOptions,
   getErrorMessage,
   isApiError,
   isSystemError,
@@ -25,7 +25,9 @@ export function meta(/*{}: Route.MetaArgs*/) {
 }
 
 export async function clientLoader({ params }: Route.ClientLoaderArgs) {
-  await queryClient.ensureQueryData(createGetVideoQueryOptions(params.id));
+  console.log(
+    await queryClient.ensureQueryData(createGetVideoQueryOptions(params.id))
+  );
 }
 
 export function HydrateFallback() {
@@ -141,7 +143,7 @@ export default function Replay({ params }: Route.ComponentProps) {
 
       // Log detailed error in development
       if (import.meta.env.DEV && isApiError(error)) {
-        console.error("Home page error:", {
+        console.error("Replay page error:", {
           code: error.code,
           status: error.status,
           message: error.message,
@@ -150,6 +152,19 @@ export default function Replay({ params }: Route.ComponentProps) {
       }
     }
   }, [isError, error]);
+
+  if (isError) {
+    return (
+      <PageBody>
+        <div className="flex flex-1 flex-col items-center justify-center gap-4 py-8">
+          <p className="text-destructive text-lg">Failed to load videos</p>
+          <p className="text-muted-foreground text-sm">
+            {getErrorMessage(error)}
+          </p>
+        </div>
+      </PageBody>
+    );
+  }
 
   const { data: video } = data;
 

@@ -4,6 +4,7 @@ import { useRevalidator, useRouteError } from "react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { VideosGrid } from "~/features/Home";
+import { createListVideosQueryOptions } from "~/features/Videos";
 import {
   Button,
   getErrorMessage,
@@ -12,7 +13,6 @@ import {
   PageBody,
   Spinner,
 } from "~/shared";
-import { createListVideosQueryOptions } from "~/shared/api/videos/query-options";
 import { queryClient } from "../providers";
 
 export function meta(/*{}: Route.MetaArgs*/) {
