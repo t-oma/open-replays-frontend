@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 
 import { Badge, formatTime } from "~/shared";
-import type { VideoSummary } from "~/shared";
+import type { VideoSummary } from "~/features/Videos";
 
 type VideoItemProps = {
   replay: VideoSummary;

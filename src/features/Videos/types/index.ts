@@ -1,5 +1,5 @@
-import * as z from "zod";
-import type { Prettify, uploadVideoSchema } from "~/shared";
+import type * as z from "zod";
+import type { uploadVideoSchema } from "../utils/validation";
 
 export type VideoSummary = {
   id: string;
@@ -22,7 +22,7 @@ export type VideoDetails = {
   comments: unknown[];
 };
 
-export type ListVideosData = Prettify<VideoSummary>[];
+export type ListVideosData = VideoSummary[];
 
 export type GetVideoData = VideoDetails;
 
@@ -35,3 +35,5 @@ export type DeleteVideoData = {
 };
 
 export type UploadFormSchema = z.infer<typeof uploadVideoSchema>;
+
+export type VideoFilters = Record<string, string>;

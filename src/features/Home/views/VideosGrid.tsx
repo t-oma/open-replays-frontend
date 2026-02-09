@@ -1,5 +1,5 @@
 import { VideoItem } from "./VideoItem";
-import type { VideoSummary } from "~/shared";
+import type { VideoSummary } from "~/features/Videos";
 
 type VideosGridProps = {
   videos?: VideoSummary[];

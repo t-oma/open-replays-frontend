@@ -1,6 +1,7 @@
 import { Controller, useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { uploadVideoSchema, useUploadVideo } from "~/features/Videos";
 import {
   Button,
   Field,
@@ -10,10 +11,8 @@ import {
   FieldLabel,
   Input,
   Textarea,
-  uploadVideoSchema,
-  useUploadVideo,
 } from "~/shared";
-import type { UploadFormSchema } from "~/shared";
+import type { UploadFormSchema } from "~/features/Videos";
 
 function UploadForm() {
   const uploadMutation = useUploadVideo();
