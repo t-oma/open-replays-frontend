@@ -1,10 +1,17 @@
-/**
- * Details types for each error category
- */
+export type ValidationTag =
+  | "required"
+  | "min_length"
+  | "max_length"
+  | "min_file_size"
+  | "max_file_size"
+  | "min_int_size"
+  | "max_int_size"
+  | "invalid_file_format";
+
 export type ValidationErrorDetails = {
-  field?: string;
-  value?: unknown;
-  constraint?: string;
+  field: string;
+  message?: string;
+  tag: ValidationTag;
 };
 
 export type FileErrorDetails = {

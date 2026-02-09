@@ -45,6 +45,8 @@ export abstract class ApiError extends Error {
  */
 export class ValidationError extends ApiError {
   code: ValidationErrorCode;
+  message: string;
+  status: number;
   details?: ValidationErrorDetails;
 
   constructor(
