@@ -1,19 +1,26 @@
-import { useEffect } from "react";
-import { useRevalidator, useRouteError } from "react-router";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useRevalidator, useRouteError } from "react-router";
 
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { VideosGrid } from "~/features/Home";
 import { createListVideosQueryOptions } from "~/features/Videos";
 import {
   Button,
+  clamp,
+  createPaginationUrl,
+  DEFAULT_PAGE_SIZE,
   getErrorMessage,
+  Input,
   isApiError,
   isSystemError,
   PageBody,
+  PaginationControls,
+  paginationParamsFromUrl,
   Spinner,
 } from "~/shared";
 import { queryClient } from "../providers";
+import type { Route } from "./+types/home";
 
 export function meta(/*{}: Route.MetaArgs*/) {
   return [
@@ -22,10 +29,21 @@ export function meta(/*{}: Route.MetaArgs*/) {
   ];
 }
 
-export async function clientLoader() {
+export async function clientLoader({ request }: Route.ClientLoaderArgs) {
+  const url = new URL(request.url);
+  const { page, pageSize } = paginationParamsFromUrl(url);
+
   console.log(
-    await queryClient.ensureQueryData(createListVideosQueryOptions({}))
+    await queryClient.ensureQueryData(
+      createListVideosQueryOptions({ page, pageSize })
+    )
   );
+
+  queryClient.prefetchQuery(
+    createListVideosQueryOptions({ page: page + 1, pageSize })
+  );
+
+  return { page, pageSize };
 }
 
 export function HydrateFallback() {
@@ -121,9 +139,11 @@ export function ErrorBoundary() {
   );
 }
 
-export default function Home() {
+export default function Home({ loaderData }: Route.ComponentProps) {
+  const { page, pageSize } = loaderData;
+
   const { data, error, isError } = useSuspenseQuery(
-    createListVideosQueryOptions({})
+    createListVideosQueryOptions({ page, pageSize })
   );
 
   // Handle errors with toast notifications (for non-fatal errors)
@@ -157,13 +177,65 @@ export default function Home() {
     );
   }
 
-  const { data: videos } = data;
+  const {
+    data: { items, pagination },
+  } = data;
 
   return (
     <PageBody>
-      <h1 className="text-lg font-semibold">Latest Replays</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-lg font-semibold">Latest Replays</h1>
+        <p className="text-muted-foreground text-sm">
+          {pagination.totalItems}{" "}
+          {pagination.totalItems === 1 ? "replay" : "replays"}
+        </p>
+      </div>
 
-      <VideosGrid videos={videos} />
+      <VideosGrid videos={items} />
+
+      <div className="flex flex-1 items-end">
+        <div className="flex w-full flex-col gap-4">
+          <PaginationControls pagination={pagination} />
+          <GoToPage />
+        </div>
+      </div>
     </PageBody>
+  );
+}
+
+function GoToPage() {
+  const [page, setPage] = useState<number | null>(null);
+
+  const navigate = useNavigate();
+
+  return (
+    <div className="flex items-center justify-center gap-2">
+      <Button variant="outline" asChild disabled={!page}>
+        {page ? (
+          <Link to={createPaginationUrl(page)}>Go to</Link>
+        ) : (
+          <span className="text-muted-foreground">Go to</span>
+        )}
+      </Button>
+      <Input
+        value={page ?? ""}
+        placeholder="123"
+        onChange={(e) => {
+          const page = parseInt(e.target.value, 10);
+          setPage(isNaN(page) ? null : page);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            if (!page) return;
+
+            navigate(createPaginationUrl(page));
+            setPage(null);
+          }
+        }}
+        name="pageToGo"
+        className="w-16 text-center"
+      />
+    </div>
   );
 }

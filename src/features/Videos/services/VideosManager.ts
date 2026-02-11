@@ -1,13 +1,5 @@
 import { videosRepository, VideosRepository } from "./VideosRepository";
-import type { SuccessResponse } from "~/shared";
-import type {
-  DeleteVideoData,
-  UploadFormSchema,
-  UploadVideoData,
-  VideoDetails,
-  VideoFilters,
-  VideoSummary,
-} from "../types";
+import type { ListVideosFilters, UploadFormSchema } from "../types";
 
 /**
  * VideosManager - mediates between View Layer and data source
@@ -19,25 +11,29 @@ export class VideosManager {
   /**
    * List videos with filters
    */
-  async listVideos(
-    filters: VideoFilters
-  ): Promise<SuccessResponse<VideoSummary[]>> {
-    return this.repository.list(filters);
+  async listVideos(filters: ListVideosFilters) {
+    const filtersRecord = Object.entries(filters).reduce(
+      (acc, [key, value]) => {
+        acc[key] = value.toString();
+        return acc;
+      },
+      {} as Record<string, string>
+    );
+
+    return this.repository.list(filtersRecord);
   }
 
   /**
    * Get single video by ID
    */
-  async getVideo(id: string): Promise<SuccessResponse<VideoDetails>> {
+  async getVideo(id: string) {
     return this.repository.getById(id);
   }
 
   /**
    * Upload video with form data
    */
-  async uploadVideo(
-    data: UploadFormSchema
-  ): Promise<SuccessResponse<UploadVideoData>> {
+  async uploadVideo(data: UploadFormSchema) {
     const formData = new FormData();
     formData.append("video", data.file);
     formData.append("title", data.title);
@@ -56,7 +52,7 @@ export class VideosManager {
   /**
    * Delete video by ID
    */
-  async deleteVideo(id: string): Promise<SuccessResponse<DeleteVideoData>> {
+  async deleteVideo(id: string) {
     return this.repository.delete(id);
   }
 }
