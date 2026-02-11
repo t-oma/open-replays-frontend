@@ -1,19 +1,25 @@
-import { useEffect } from "react";
-import { useRevalidator, useRouteError } from "react-router";
+import { useEffect, useMemo } from "react";
+import { useNavigate, useRevalidator, useRouteError } from "react-router";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { VideosGrid } from "~/features/Home";
+import { VideosSkeletonGrid } from "~/features/Home/views/VideosSkeletonGrid";
 import { createListVideosQueryOptions } from "~/features/Videos";
 import {
   Button,
   getErrorMessage,
+  GoToPage,
   isApiError,
   isSystemError,
   PageBody,
+  PaginationControls,
+  paginationParamsFromUrl,
   Spinner,
+  useBoundsValidation,
 } from "~/shared";
 import { queryClient } from "../providers";
+import type { Route } from "./+types/home";
 
 export function meta(/*{}: Route.MetaArgs*/) {
   return [
@@ -22,17 +28,27 @@ export function meta(/*{}: Route.MetaArgs*/) {
   ];
 }
 
-export async function clientLoader() {
-  console.log(
-    await queryClient.ensureQueryData(createListVideosQueryOptions({}))
-  );
+export async function clientLoader({ request }: Route.ClientLoaderArgs) {
+  const url = new URL(request.url);
+  const { page, pageSize } = paginationParamsFromUrl(url);
+
+  await Promise.all([
+    queryClient.ensureQueryData(
+      createListVideosQueryOptions({ page, pageSize })
+    ),
+    queryClient.prefetchQuery(
+      createListVideosQueryOptions({ page: page + 1, pageSize })
+    ),
+  ]);
+
+  return { page, pageSize };
 }
 
 export function HydrateFallback() {
   return (
     <PageBody>
       <div className="flex flex-1 items-center justify-center py-8">
-        <Spinner className="text-primary size-10" />
+        <VideosSkeletonGrid />
       </div>
     </PageBody>
   );
@@ -121,9 +137,19 @@ export function ErrorBoundary() {
   );
 }
 
-export default function Home() {
+export default function Home({ loaderData }: Route.ComponentProps) {
+  const { page, pageSize } = loaderData;
+
   const { data, error, isError } = useSuspenseQuery(
-    createListVideosQueryOptions({})
+    createListVideosQueryOptions({ page, pageSize })
+  );
+  const navigate = useNavigate();
+
+  const items = data.data.items;
+
+  const pagination = useMemo(
+    () => data.data.pagination,
+    [data.data.pagination]
   );
 
   // Handle errors with toast notifications (for non-fatal errors)
@@ -144,6 +170,19 @@ export default function Home() {
     }
   }, [isError, error]);
 
+  useBoundsValidation({
+    value: pagination.page,
+    min: 1,
+    max: pagination.totalPages,
+    onOutOfBounds: (closest) => {
+      const searchParams = new URLSearchParams({
+        page: closest.toString(),
+        pageSize: pagination.pageSize.toString(),
+      });
+      navigate(`/?${searchParams}`);
+    },
+  });
+
   if (isError) {
     return (
       <PageBody>
@@ -157,13 +196,28 @@ export default function Home() {
     );
   }
 
-  const { data: videos } = data;
-
   return (
     <PageBody>
-      <h1 className="text-lg font-semibold">Latest Replays</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-lg font-semibold">Latest Replays</h1>
+        <p className="text-muted-foreground text-sm">
+          {pagination.totalItems}{" "}
+          {pagination.totalItems === 1 ? "replay" : "replays"}
+        </p>
+      </div>
 
-      <VideosGrid videos={videos} />
+      {items.length === 0 ? (
+        <div className="flex flex-1 items-center justify-center">
+          <p className="text-muted-foreground text-sm">No replays found</p>
+        </div>
+      ) : (
+        <VideosGrid videos={items} />
+      )}
+
+      <div className="flex w-full flex-col gap-4 pt-4">
+        <PaginationControls pagination={pagination} />
+        <GoToPage totalPages={pagination.totalPages} />
+      </div>
     </PageBody>
   );
 }

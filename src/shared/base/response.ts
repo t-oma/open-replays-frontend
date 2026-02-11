@@ -45,6 +45,20 @@ export type SuccessResponse<T> = {
   message?: string;
 };
 
+export type PaginationInfo = {
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  totalItems: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+};
+
+export type PaginatedData<T> = {
+  items: T[];
+  pagination: PaginationInfo;
+};
+
 export type ApiResponse<T> = SuccessResponse<T> | ErrorResponse;
 
 /**

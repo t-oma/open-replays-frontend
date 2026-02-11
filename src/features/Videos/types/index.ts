@@ -1,4 +1,5 @@
 import type * as z from "zod";
+import type { PaginatedData } from "~/shared/base/response";
 import type { uploadVideoSchema } from "../utils/validation";
 
 export type VideoSummary = {
@@ -22,7 +23,7 @@ export type VideoDetails = {
   comments: unknown[];
 };
 
-export type ListVideosData = VideoSummary[];
+export type ListVideosData = PaginatedData<VideoSummary>;
 
 export type GetVideoData = VideoDetails;
 
@@ -36,4 +37,7 @@ export type DeleteVideoData = {
 
 export type UploadFormSchema = z.infer<typeof uploadVideoSchema>;
 
-export type VideoFilters = Record<string, string>;
+export type ListVideosFilters = {
+  page?: number;
+  pageSize?: number;
+};

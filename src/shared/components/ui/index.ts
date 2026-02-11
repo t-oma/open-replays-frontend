@@ -1,3 +1,4 @@
+export * from "./skeleton";
 export * from "./pagination";
 export * from "./badge";
 export * from "./avatar";

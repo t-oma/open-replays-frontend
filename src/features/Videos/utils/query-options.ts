@@ -1,11 +1,12 @@
 import { queryOptions } from "@tanstack/react-query";
 import { videoKeys, videosManager } from "..";
-import type { VideoFilters } from "../types";
+import type { ListVideosFilters } from "../types";
 
-export function createListVideosQueryOptions(filters: VideoFilters) {
+export function createListVideosQueryOptions(filters: ListVideosFilters) {
   return queryOptions({
     queryKey: videoKeys.list(filters),
     queryFn: () => videosManager.listVideos(filters),
+    staleTime: 5 * 60 * 1000,
   });
 }
 

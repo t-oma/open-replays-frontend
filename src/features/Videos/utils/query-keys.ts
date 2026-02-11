@@ -1,7 +1,9 @@
+import type { ListVideosFilters } from "../types";
+
 export const videoKeys = {
   all: ["videos"] as const,
   lists: () => [...videoKeys.all, "list"] as const,
-  list: (filters: Record<string, unknown>) =>
+  list: (filters: ListVideosFilters) =>
     [...videoKeys.lists(), filters] as const,
   details: () => [...videoKeys.all, "detail"] as const,
   detail: (id: string) => [...videoKeys.details(), id] as const,

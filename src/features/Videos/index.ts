@@ -6,7 +6,7 @@ export type {
   UploadVideoData,
   DeleteVideoData,
   UploadFormSchema,
-  VideoFilters,
+  ListVideosFilters,
 } from "./types";
 
 export { useUploadVideo, useDeleteVideo } from "./hooks/useVideos";
