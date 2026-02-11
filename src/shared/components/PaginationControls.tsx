@@ -20,7 +20,7 @@ function PaginationControls({ pagination }: { pagination: PaginationInfo }) {
       <PaginationContent>
         <PaginationItem>
           <PaginationPrevious
-            to={createPaginationUrl(page - 1, pageSize)}
+            to={createPaginationUrl(Math.max(1, page - 1), pageSize)}
             aria-disabled={!hasPrevPage}
             className={!hasPrevPage ? "pointer-events-none opacity-50" : ""}
           />
@@ -49,7 +49,7 @@ function PaginationControls({ pagination }: { pagination: PaginationInfo }) {
 
         <PaginationItem>
           <PaginationNext
-            to={createPaginationUrl(page + 1, pageSize)}
+            to={createPaginationUrl(Math.min(page + 1, totalPages), pageSize)}
             aria-disabled={!hasNextPage}
             className={!hasNextPage ? "pointer-events-none opacity-50" : ""}
           />

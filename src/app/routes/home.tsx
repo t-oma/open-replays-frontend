@@ -1,17 +1,15 @@
-import { useEffect, useState } from "react";
-import { Link, useNavigate, useRevalidator, useRouteError } from "react-router";
+import { useEffect, useMemo } from "react";
+import { useNavigate, useRevalidator, useRouteError } from "react-router";
 
-import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { VideosGrid } from "~/features/Home";
+import { VideosSkeletonGrid } from "~/features/Home/views/VideosSkeletonGrid";
 import { createListVideosQueryOptions } from "~/features/Videos";
 import {
   Button,
-  clamp,
-  createPaginationUrl,
-  DEFAULT_PAGE_SIZE,
   getErrorMessage,
-  Input,
+  GoToPage,
   isApiError,
   isSystemError,
   PageBody,
@@ -33,15 +31,14 @@ export async function clientLoader({ request }: Route.ClientLoaderArgs) {
   const url = new URL(request.url);
   const { page, pageSize } = paginationParamsFromUrl(url);
 
-  console.log(
-    await queryClient.ensureQueryData(
+  await Promise.all([
+    queryClient.ensureQueryData(
       createListVideosQueryOptions({ page, pageSize })
-    )
-  );
-
-  queryClient.prefetchQuery(
-    createListVideosQueryOptions({ page: page + 1, pageSize })
-  );
+    ),
+    queryClient.prefetchQuery(
+      createListVideosQueryOptions({ page: page + 1, pageSize })
+    ),
+  ]);
 
   return { page, pageSize };
 }
@@ -50,7 +47,7 @@ export function HydrateFallback() {
   return (
     <PageBody>
       <div className="flex flex-1 items-center justify-center py-8">
-        <Spinner className="text-primary size-10" />
+        <VideosSkeletonGrid />
       </div>
     </PageBody>
   );
@@ -145,6 +142,14 @@ export default function Home({ loaderData }: Route.ComponentProps) {
   const { data, error, isError } = useSuspenseQuery(
     createListVideosQueryOptions({ page, pageSize })
   );
+  const navigate = useNavigate();
+
+  const items = data.data.items;
+
+  const pagination = useMemo(
+    () => data.data.pagination,
+    [data.data.pagination]
+  );
 
   // Handle errors with toast notifications (for non-fatal errors)
   useEffect(() => {
@@ -164,6 +169,23 @@ export default function Home({ loaderData }: Route.ComponentProps) {
     }
   }, [isError, error]);
 
+  useEffect(() => {
+    if (pagination.page > pagination.totalPages) {
+      const searchParams = new URLSearchParams({
+        page: pagination.totalPages.toString(),
+        pageSize: pagination.pageSize.toString(),
+      });
+      navigate(`/?${searchParams}`);
+    }
+    if (pagination.page < 1) {
+      const searchParams = new URLSearchParams({
+        page: "1",
+        pageSize: pagination.pageSize.toString(),
+      });
+      navigate(`/?${searchParams}`);
+    }
+  }, [pagination.page, pagination.pageSize, pagination.totalPages, navigate]);
+
   if (isError) {
     return (
       <PageBody>
@@ -177,10 +199,6 @@ export default function Home({ loaderData }: Route.ComponentProps) {
     );
   }
 
-  const {
-    data: { items, pagination },
-  } = data;
-
   return (
     <PageBody>
       <div className="flex items-center justify-between">
@@ -191,51 +209,18 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         </p>
       </div>
 
-      <VideosGrid videos={items} />
-
-      <div className="flex flex-1 items-end">
-        <div className="flex w-full flex-col gap-4">
-          <PaginationControls pagination={pagination} />
-          <GoToPage />
+      {items.length === 0 ? (
+        <div className="flex flex-1 items-center justify-center">
+          <p className="text-muted-foreground text-sm">No replays found</p>
         </div>
+      ) : (
+        <VideosGrid videos={items} />
+      )}
+
+      <div className="flex w-full flex-col gap-4 pt-4">
+        <PaginationControls pagination={pagination} />
+        <GoToPage totalPages={pagination.totalPages} />
       </div>
     </PageBody>
-  );
-}
-
-function GoToPage() {
-  const [page, setPage] = useState<number | null>(null);
-
-  const navigate = useNavigate();
-
-  return (
-    <div className="flex items-center justify-center gap-2">
-      <Button variant="outline" asChild disabled={!page}>
-        {page ? (
-          <Link to={createPaginationUrl(page)}>Go to</Link>
-        ) : (
-          <span className="text-muted-foreground">Go to</span>
-        )}
-      </Button>
-      <Input
-        value={page ?? ""}
-        placeholder="123"
-        onChange={(e) => {
-          const page = parseInt(e.target.value, 10);
-          setPage(isNaN(page) ? null : page);
-        }}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            if (!page) return;
-
-            navigate(createPaginationUrl(page));
-            setPage(null);
-          }
-        }}
-        name="pageToGo"
-        className="w-16 text-center"
-      />
-    </div>
   );
 }
