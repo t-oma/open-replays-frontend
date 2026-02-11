@@ -16,6 +16,7 @@ import {
   PaginationControls,
   paginationParamsFromUrl,
   Spinner,
+  useBoundsValidation,
 } from "~/shared";
 import { queryClient } from "../providers";
 import type { Route } from "./+types/home";
@@ -169,22 +170,18 @@ export default function Home({ loaderData }: Route.ComponentProps) {
     }
   }, [isError, error]);
 
-  useEffect(() => {
-    if (pagination.page > pagination.totalPages) {
+  useBoundsValidation({
+    value: pagination.page,
+    min: 1,
+    max: pagination.totalPages,
+    onOutOfBounds: (closest) => {
       const searchParams = new URLSearchParams({
-        page: pagination.totalPages.toString(),
+        page: closest.toString(),
         pageSize: pagination.pageSize.toString(),
       });
       navigate(`/?${searchParams}`);
-    }
-    if (pagination.page < 1) {
-      const searchParams = new URLSearchParams({
-        page: "1",
-        pageSize: pagination.pageSize.toString(),
-      });
-      navigate(`/?${searchParams}`);
-    }
-  }, [pagination.page, pagination.pageSize, pagination.totalPages, navigate]);
+    },
+  });
 
   if (isError) {
     return (
